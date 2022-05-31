@@ -1,0 +1,60 @@
+{
+  "name": "egg-uploader",
+  "version": "1.0.0",
+  "description": "基于egg实现的上传服务，支持本地上传、阿里云上传、七牛上传等",
+  "private": true,
+  "egg": {
+    "declarations": true
+  },
+  "dependencies": {
+    "await-stream-ready": "^1.0.1",
+    "egg": "^2.15.1",
+    "egg-mysql": "^3.1.0",
+    "egg-scripts": "^2.11.0",
+    "egg-sequelize": "^6.0.0",
+    "moment": "^2.29.3",
+    "mysql2": "^2.3.3",
+    "stream-wormhole": "^1.1.0"
+  },
+  "devDependencies": {
+    "autod": "^3.0.1",
+    "autod-egg": "^1.1.0",
+    "egg-bin": "^4.11.0",
+    "egg-ci": "^1.11.0",
+    "egg-mock": "^3.21.0",
+    "eslint": "^5.13.0",
+    "eslint-config-egg": "^7.1.0",
+    "sequelize-cli": "^6.4.1"
+  },
+  "engines": {
+    "node": ">=10.0.0"
+  },
+  "scripts": {
+    "start": "egg-scripts start --daemon --title=egg-server-egg-uploader",
+    "stop": "egg-scripts stop --title=egg-server-egg-uploader",
+    "dev": "egg-bin dev",
+    "debug": "egg-bin debug",
+    "test": "npm run lint -- --fix && npm run test-local",
+    "test-local": "egg-bin test",
+    "cov": "egg-bin cov",
+    "lint": "eslint .",
+    "ci": "npm run lint && npm run cov",
+    "autod": "autod",
+    "init-db": "npx sequelize db:migrate && npx sequelize db:seed:all",
+    "init-db:dev": "NODE_ENV=development npx sequelize db:migrate",
+    "init-data:dev": "NODE_ENV=development npx sequelize db:seed:all",
+    "init-db:test": "NODE_ENV=test npx sequelize db:migrate",
+    "init-data:test": "NODE_ENV=test npx sequelize db:seed:all",
+    "init-db:prod": "NODE_ENV=production npx sequelize db:migrate",
+    "init-data:prod": "NODE_ENV=production npx sequelize db:seed:all"
+  },
+  "ci": {
+    "version": "10"
+  },
+  "repository": {
+    "type": "git",
+    "url": ""
+  },
+  "author": "ZhuPengliang",
+  "license": "MIT"
+}
