@@ -2,7 +2,7 @@
  * @description: 上传附件表
  * @author: zpl
  * @Date: 2022-05-31 12:38:15
- * @LastEditTime: 2022-05-31 17:00:26
+ * @LastEditTime: 2022-05-31 21:43:12
  * @LastEditors: zpl
  */
 'use strict';
@@ -16,7 +16,7 @@ module.exports = app => {
       primaryKey: true,
     },
     filename: {
-      type: Sequelize.STRING(20),
+      type: Sequelize.STRING(64),
       allowNull: false,
       comment: '文件名',
     },

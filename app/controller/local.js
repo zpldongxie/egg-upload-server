@@ -2,7 +2,7 @@
  * @description: 本地上传
  * @author: zpl
  * @Date: 2022-05-31 11:06:37
- * @LastEditTime: 2022-05-31 18:08:38
+ * @LastEditTime: 2022-05-31 21:56:30
  * @LastEditors: zpl
  */
 'use strict';
@@ -12,8 +12,6 @@ const fs = require('fs');
 const path = require('path');
 const awaitWriteStream = require('await-stream-ready').write;
 const sendToWormhole = require('stream-wormhole');
-
-
 
 class LocalController extends Controller {
   /**
@@ -27,7 +25,7 @@ class LocalController extends Controller {
     const stream = await ctx.getFileStream();
     const attachment = new ctx.model.Attachment();
     // 上传单个文件
-    const attInfo = await helper.uploadSingle(stream, attachment, config)
+    const attInfo = await helper.uploadSingle(stream, attachment, config);
     // 调用 Service 进行业务处理
     const res = await service.attachment.create(attInfo);
     // 设置响应内容和响应状态码
@@ -40,23 +38,28 @@ class LocalController extends Controller {
    * @memberof LocalController
    */
   async multiple() {
-    const { ctx, service } = this
-    const  { multipart } = ctx;
-    const res = {}
-    const files = []
+    const { ctx, service, config } = this;
+    const res = {};
+    const files = [];
 
-    let part
-    while ((part = await multipart()) != null) {
+    let part;
+    while ((part = await ctx.multipart()) != null) {
       if (part.length) {
         // 表单filed 不做处理
       } else {
         if (!part.filename) {
           throw new Error('未选择文件');
         }
-        const filename = part.filename.toLowerCase() // 文件名称
-        const extname = path.extname(part.filename).toLowerCase() // 文件扩展名称
+        const attachment = new ctx.model.Attachment();
+        // 上传单个文件
+        const attInfo = await helper.uploadSingle(part, attachment, config);
+        // 调用 Service 进行业务处理
+        const res = await service.attachment.create(attInfo);
+        files.push(res)
       }
     }
+    // 设置响应内容和响应状态码
+    ctx.helper.success({ ctx, files });
   }
 }
 

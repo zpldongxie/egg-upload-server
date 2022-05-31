@@ -7,4 +7,5 @@ module.exports = app => {
   const { router, controller } = app;
 
   router.post('/upload/local/single', controller.local.single)
+  router.post('/upload/local/multiple', controller.local.multiple)
 };
