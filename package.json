@@ -31,9 +31,9 @@
     "node": ">=10.0.0"
   },
   "scripts": {
-    "start": "egg-scripts start --daemon --title=egg-server-egg-uploader",
+    "start": "egg-scripts start --port=2000 --daemon --title=egg-server-egg-uploader",
     "stop": "egg-scripts stop --title=egg-server-egg-uploader",
-    "dev": "egg-bin dev",
+    "dev": "egg-bin dev --port=2000",
     "debug": "egg-bin debug",
     "test": "npm run lint -- --fix && npm run test-local",
     "test-local": "egg-bin test",
