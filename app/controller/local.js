@@ -2,7 +2,7 @@
  * @description: 本地上传
  * @author: zpl
  * @Date: 2022-05-31 11:06:37
- * @LastEditTime: 2022-06-01 12:02:52
+ * @LastEditTime: 2022-06-01 14:36:13
  * @LastEditors: zpl
  */
 'use strict';
@@ -11,6 +11,19 @@ const Controller = require('egg').Controller;
 const download = require('image-downloader');
 
 class LocalController extends Controller {
+  /**
+   * 获取单个文件
+   *
+   * @memberof LocalController
+   */
+  async show() {
+    const { ctx, service } = this
+    const { id } = ctx.params
+    const res = await service.attachment.show(id)
+    // 设置响应内容和响应状态码
+    ctx.helper.success({ctx, res})
+  }
+
   /**
    * 上传单个文件
    *
@@ -107,7 +120,22 @@ class LocalController extends Controller {
     // 调用 Service 进行业务处理
     const { id, ...info } = attachment.dataValues;
     const res = await service.attachment.update(id, info);
-    helper.success({ctx, res})
+    helper.success({ ctx, res });
+  }
+
+  /**
+   * 编辑图片描述
+   *
+   * @memberof LocalController
+   */
+  async extra() {
+    const { ctx, service } = this;
+    const {params, request: {body}} = ctx;
+    const { id } = params;
+    const {extra} = body;
+    const res = await service.attachment.update(id, {extra});
+    // 设置响应内容和响应状态码
+    ctx.helper.success({ ctx, res });
   }
 
   /**
@@ -116,13 +144,13 @@ class LocalController extends Controller {
    * @memberof LocalController
    */
   async destroy() {
-    const { ctx, service } = this
+    const { ctx, service } = this;
     // 校验参数
-    const { id } = ctx.params
+    const { id } = ctx.params;
     // 调用 Service 进行业务处理
-    await service.attachment.destroy(id)
+    await service.attachment.destroy(id);
     // 设置响应内容和响应状态码
-    ctx.helper.success({ctx})
+    ctx.helper.success({ ctx });
   }
 }
 

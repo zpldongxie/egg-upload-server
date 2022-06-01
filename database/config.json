@@ -3,7 +3,7 @@
     "username": "root",
     "password": "Clouddeep@8890",
     "database": "ysp_uploads",
-    "host": "49.233.193.39",
+    "host": "127.0.0.1",
     "dialect": "mysql",
     "seederStorage": "sequelize"
   },
@@ -11,7 +11,7 @@
     "username": "root",
     "password": "Clouddeep@8890",
     "database": "ysp_uploads",
-    "host": "49.233.193.39",
+    "host": "127.0.0.1",
     "dialect": "mysql",
     "seederStorage": "sequelize"
   },

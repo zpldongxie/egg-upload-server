@@ -2,7 +2,7 @@
  * @description: 上传附件
  * @author: zpl
  * @Date: 2022-05-31 14:12:09
- * @LastEditTime: 2022-06-01 12:04:08
+ * @LastEditTime: 2022-06-01 14:37:59
  * @LastEditors: zpl
  */
 'use strict';
@@ -12,6 +12,39 @@ const path = require('path');
 const Service = require('egg').Service;
 
 class AttachmentService extends Service {
+  /**
+   * 查询单个
+   *
+   * @param {*} id
+   * @return {*} 
+   * @memberof AttachmentService
+   */
+  async show(id) {
+    const { ctx } = this;
+    const { model } = ctx;
+    const attachment = await model.Attachment.findOne({ where: { id } });
+    if (!attachment) {
+      this.ctx.throw(404, '未找到指定记录');
+    }
+    return attachment.toJSON();
+  }
+
+  /**
+   * 查询列表，支持分页和按名称模糊查询
+   *
+   * @param {*} options
+   * @memberof AttachmentService
+   */
+  async index(options) {
+    const attachmentKind = { 
+      image: ['.jpg', '.jpeg', '.png', '.gif'], 
+      document: ['.doc', '.docx', '.ppt', '.pptx', '.xls', '.xlsx', '.csv', '.key', '.numbers', '.pages', '.pdf', '.txt', '.psd', '.zip', '.gz', '.tgz', '.gzip' ],
+      video: ['.mov', '.mp4', '.avi'],
+      audio: ['.mp3', '.wma', '.wav', '.ogg', '.ape', '.acc']
+    }
+    const { currentPage, pageSize, isPaging, search, kind } = options
+  }
+
   /**
    * 新增
    *
@@ -69,15 +102,15 @@ class AttachmentService extends Service {
    * @memberof AttachmentService
    */
   async destroy(id) {
-    const { ctx } = this
+    const { ctx } = this;
     const { model } = ctx;
-    const attachment = await model.Attachment.findOne({ where: { id } })
+    const attachment = await model.Attachment.findOne({ where: { id } });
     if (!attachment) {
-      ctx.throw(404, '未找到指定记录')
-    }else{
+      ctx.throw(404, '未找到指定记录');
+    } else {
       fs.unlinkSync(attachment.path);
     }
-    await attachment.destroy()
+    await attachment.destroy();
   }
 }
 
