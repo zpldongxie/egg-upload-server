@@ -2,7 +2,7 @@
  * @description: 本地上传
  * @author: zpl
  * @Date: 2022-05-31 11:06:37
- * @LastEditTime: 2022-06-01 11:17:05
+ * @LastEditTime: 2022-06-01 12:02:52
  * @LastEditors: zpl
  */
 'use strict';
@@ -108,6 +108,21 @@ class LocalController extends Controller {
     const { id, ...info } = attachment.dataValues;
     const res = await service.attachment.update(id, info);
     helper.success({ctx, res})
+  }
+
+  /**
+   * 删除单个
+   *
+   * @memberof LocalController
+   */
+  async destroy() {
+    const { ctx, service } = this
+    // 校验参数
+    const { id } = ctx.params
+    // 调用 Service 进行业务处理
+    await service.attachment.destroy(id)
+    // 设置响应内容和响应状态码
+    ctx.helper.success({ctx})
   }
 }
 

@@ -2,7 +2,7 @@
  * @description: 上传附件
  * @author: zpl
  * @Date: 2022-05-31 14:12:09
- * @LastEditTime: 2022-06-01 11:16:49
+ * @LastEditTime: 2022-06-01 12:04:08
  * @LastEditors: zpl
  */
 'use strict';
@@ -60,6 +60,24 @@ class AttachmentService extends Service {
     }
     const atta = await attachment.update(info);
     return atta.toJSON();
+  }
+
+  /**
+   * 删除
+   *
+   * @param {*} id
+   * @memberof AttachmentService
+   */
+  async destroy(id) {
+    const { ctx } = this
+    const { model } = ctx;
+    const attachment = await model.Attachment.findOne({ where: { id } })
+    if (!attachment) {
+      ctx.throw(404, '未找到指定记录')
+    }else{
+      fs.unlinkSync(attachment.path);
+    }
+    await attachment.destroy()
   }
 }
 

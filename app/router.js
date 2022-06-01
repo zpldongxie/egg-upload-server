@@ -10,4 +10,5 @@ module.exports = app => {
   router.post('/upload/local/multiple', controller.local.multiple);
   router.post('/upload/local/url', controller.local.url);
   router.post('/upload/local/update/:id', controller.local.update)
+  router.delete('/upload/local/:id', controller.local.destroy)
 };
