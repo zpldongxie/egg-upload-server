@@ -41,17 +41,44 @@ module.exports = {
    * @param {*} fullname 文件名或url
    * @param {*} attachment 附件记录对象
    * @param {*} config 全局配置信息
+   * @param {string} [subPath=''] 子路径，可选
    */
-  initAttachmentInfo: async (fullname, attachment, config) => {
-    const filename = path.basename(fullname); // 文件名称
-    const extname = path.extname(fullname).toLowerCase(); // 文件扩展名称
+  initAttachmentInfo: async (fullname, attachment, config, subPath = '') => {
+    if (subPath?.includes('..')) {
+      // 不允许通过../对目录进行遍历
+      throw new Error('上传路径非法');
+    }
+     // 文件名称
+    const filename = path.basename(fullname);
+     // 文件扩展名称
+    const extname = path.extname(fullname).toLowerCase();
+    // 预览地址
+    let baseUrl = config.uploadBaseUrl || '/uploads';
+    if (!baseUrl.endsWith('/')) {
+      baseUrl += '/';
+    }
+    let realSubPath = subPath;
+    if (subPath) {
+      if (realSubPath.startsWith('/')) {
+        realSubPath = realSubPath.substring(1);
+      }
+      if (!realSubPath.endsWith('/')) {
+        realSubPath += '/'
+      }
+    }
+    const realBaseUrl = `${baseUrl}${realSubPath || ''}`;
+    // 上传位置
+    const basePath = config.uploadBaseDir || `${config.baseDir}/app/public/uploads`;
+    const targetPath = path.join(basePath, subPath);
+    if (!fs.existsSync(targetPath)) {
+      fs.mkdirSync(targetPath, { recursive: true });
+    }
+    const target = path.join(targetPath, `${attachment.id}${attachment.extname}`);
+
     // 组装参数 model
     attachment.extname = extname;
     attachment.filename = filename;
-    const baseUrl = config.uploadBaseUrl || '/uploads';
-    attachment.url = `${baseUrl}/${attachment.id}${extname}`;
-    const basePath = config.uploadBaseDir || `${config.baseDir}/app/public/uploads`;
-    const target = path.join(basePath, `${attachment.id}${attachment.extname}`);
+    attachment.url = `${realBaseUrl}${attachment.id}${extname}`
     attachment.path = target;
   },
   /**
