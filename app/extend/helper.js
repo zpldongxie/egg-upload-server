@@ -6,6 +6,17 @@ const moment = require('moment');
 
 module.exports = {
   /**
+   * 字符串转数字
+   *
+   * @param {*} str 字符串
+   * @return {*} number
+   */
+  toInt(str) {
+    if (typeof str === 'number') return str;
+    if (!str) return null;
+    return parseInt(str, 10) || 0;
+  },
+  /**
    * 格式化时间
    *
    * @param {*} time

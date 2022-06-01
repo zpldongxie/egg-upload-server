@@ -2,7 +2,7 @@
  * @description: 上传附件
  * @author: zpl
  * @Date: 2022-05-31 14:12:09
- * @LastEditTime: 2022-06-01 14:37:59
+ * @LastEditTime: 2022-06-01 15:25:40
  * @LastEditors: zpl
  */
 'use strict';
@@ -16,7 +16,7 @@ class AttachmentService extends Service {
    * 查询单个
    *
    * @param {*} id
-   * @return {*} 
+   * @return {*}
    * @memberof AttachmentService
    */
   async show(id) {
@@ -30,19 +30,78 @@ class AttachmentService extends Service {
   }
 
   /**
-   * 查询列表，支持分页和按名称模糊查询
+   * 查询列表，支持排序分页和按名称模糊查询
    *
    * @param {*} options
    * @memberof AttachmentService
    */
   async index(options) {
-    const attachmentKind = { 
-      image: ['.jpg', '.jpeg', '.png', '.gif'], 
-      document: ['.doc', '.docx', '.ppt', '.pptx', '.xls', '.xlsx', '.csv', '.key', '.numbers', '.pages', '.pdf', '.txt', '.psd', '.zip', '.gz', '.tgz', '.gzip' ],
+    const { app, ctx } = this;
+    const {
+      Sequelize: { Op },
+    } = app;
+    const { helper } = ctx;
+    const attachmentKind = {
+      image: ['.jpg', '.jpeg', '.png', '.gif'],
+      document: [
+        '.doc',
+        '.docx',
+        '.ppt',
+        '.pptx',
+        '.xls',
+        '.xlsx',
+        '.csv',
+        '.key',
+        '.numbers',
+        '.pages',
+        '.pdf',
+        '.txt',
+        '.psd',
+        '.zip',
+        '.gz',
+        '.tgz',
+        '.gzip',
+      ],
       video: ['.mov', '.mp4', '.avi'],
-      audio: ['.mp3', '.wma', '.wav', '.ogg', '.ape', '.acc']
+      audio: ['.mp3', '.wma', '.wav', '.ogg', '.ape', '.acc'],
+    };
+    const { pageIndex, pageSize, sort, search, kind } = options;
+    const pIndex = helper.toInt(pageIndex);
+    const pSize = helper.toInt(pageSize);
+    const params = {
+      where: {},
+      order: [],
+    };
+    // 按文件类型筛选
+    if (search) {
+      params.where.filename = { [Op.regexp]: search };
     }
-    const { currentPage, pageSize, isPaging, search, kind } = options
+    // 按文件类型筛选
+    if (kind) {
+      params.where.extname = { [Op.in]: attachmentKind[kind] };
+    }
+    // 排序
+    if (sort) {
+      const querySort = JSON.parse(sort);
+      for (const key in querySort) {
+        if (Object.hasOwnProperty.call(querySort, key)) {
+          const value = querySort[key];
+          params.order.push([key, value]);
+        }
+      }
+    }
+    params.order.push(['createdAt', 'asc']);
+    // 分页
+    if (pIndex !== null && pSize !== null) {
+      params.limit = pSize;
+      params.offset = (pIndex - 1) * pSize;
+    }
+    const { count, rows } = await ctx.model.Attachment.findAndCountAll(params);
+    return {
+      success: true,
+      total: count,
+      data: rows.map(row => row.toJSON()),
+    };
   }
 
   /**

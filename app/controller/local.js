@@ -2,7 +2,7 @@
  * @description: 本地上传
  * @author: zpl
  * @Date: 2022-05-31 11:06:37
- * @LastEditTime: 2022-06-01 14:36:13
+ * @LastEditTime: 2022-06-01 15:26:30
  * @LastEditors: zpl
  */
 'use strict';
@@ -12,16 +12,28 @@ const download = require('image-downloader');
 
 class LocalController extends Controller {
   /**
+   * 查询列表，支持排序分页和按名称模糊查询
+   *
+   * @memberof LocalController
+   */
+  async index() {
+    const { ctx } = this;
+    const { query, service } = ctx;
+    const res = await service.attachment.index(query);
+    // 设置响应内容和响应状态码
+    ctx.helper.success({ ctx, res });
+  }
+  /**
    * 获取单个文件
    *
    * @memberof LocalController
    */
   async show() {
-    const { ctx, service } = this
-    const { id } = ctx.params
-    const res = await service.attachment.show(id)
+    const { ctx, service } = this;
+    const { id } = ctx.params;
+    const res = await service.attachment.show(id);
     // 设置响应内容和响应状态码
-    ctx.helper.success({ctx, res})
+    ctx.helper.success({ ctx, res });
   }
 
   /**
@@ -130,10 +142,13 @@ class LocalController extends Controller {
    */
   async extra() {
     const { ctx, service } = this;
-    const {params, request: {body}} = ctx;
+    const {
+      params,
+      request: { body },
+    } = ctx;
     const { id } = params;
-    const {extra} = body;
-    const res = await service.attachment.update(id, {extra});
+    const { extra } = body;
+    const res = await service.attachment.update(id, { extra });
     // 设置响应内容和响应状态码
     ctx.helper.success({ ctx, res });
   }

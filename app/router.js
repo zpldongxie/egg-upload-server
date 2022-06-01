@@ -6,6 +6,7 @@
 module.exports = app => {
   const { router, controller } = app;
 
+  router.get('/upload/local', controller.local.index); // 查询列表
   router.get('/upload/local/:id', controller.local.show); // 获取单个文件
   router.post('/upload/local/single', controller.local.single); // 上传单个文件
   router.post('/upload/local/multiple', controller.local.multiple); // 批量上传
