@@ -8,4 +8,5 @@ module.exports = app => {
 
   router.post('/upload/local/single', controller.local.single)
   router.post('/upload/local/multiple', controller.local.multiple)
+  router.post('/upload/local/url', controller.local.url)
 };
