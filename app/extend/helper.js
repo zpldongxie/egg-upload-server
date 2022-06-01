@@ -25,24 +25,31 @@ module.exports = {
     ctx.status = 200;
   },
   /**
-   * 上传单个文件
+   * 组装附件属性
    *
-   * @param {*} stream 文件流
+   * @param {*} fullname 文件名或url
    * @param {*} attachment 附件记录对象
    * @param {*} config 全局配置信息
-   * @return {*} 上传完成后返回附件记录信息，用于入库等后续操作
    */
-  uploadSingle: async (stream, attachment, config) => {
-    const filename = path.basename(stream.filename); // 文件名称
-    const extname = path.extname(stream.filename).toLowerCase(); // 文件扩展名称
+  initAttachmentInfo: async (fullname, attachment, config) => {
+    const filename = path.basename(fullname); // 文件名称
+    const extname = path.extname(fullname).toLowerCase(); // 文件扩展名称
     // 组装参数 model
     attachment.extname = extname;
     attachment.filename = filename;
     const baseUrl = config.uploadBaseUrl || '/uploads';
-    attachment.url = new URL(`${baseUrl}/${attachment.id}${extname}`).href;
+    attachment.url = `${baseUrl}/${attachment.id}${extname}`;
     const basePath = config.uploadBaseDir || `${config.baseDir}/app/public/uploads`;
     const target = path.join(basePath, `${attachment.id}${attachment.extname}`);
     attachment.path = target;
+  },
+  /**
+   * 上传单个文件或片段
+   *
+   * @param {*} stream 文件流
+   * @param {*} target 保存位置
+   */
+  uploadSingle: async (stream, target) => {
     // 组装参数 stream
     const writeStream = fs.createWriteStream(target);
     // 文件处理，上传到云存储等等
@@ -53,6 +60,5 @@ module.exports = {
       await sendToWormhole(stream);
       throw err;
     }
-    return attachment.dataValues;
   },
 };

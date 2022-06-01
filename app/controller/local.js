@@ -2,14 +2,13 @@
  * @description: 本地上传
  * @author: zpl
  * @Date: 2022-05-31 11:06:37
- * @LastEditTime: 2022-06-01 09:03:37
+ * @LastEditTime: 2022-06-01 11:17:05
  * @LastEditors: zpl
  */
 'use strict';
 
 const Controller = require('egg').Controller;
-const path = require('path');
-const download = require('image-downloader')
+const download = require('image-downloader');
 
 class LocalController extends Controller {
   /**
@@ -22,12 +21,14 @@ class LocalController extends Controller {
     const { helper } = ctx;
     const stream = await ctx.getFileStream();
     const attachment = new ctx.model.Attachment();
+    // 组装上传记录信息
+    await helper.initAttachmentInfo(stream.filename, attachment, config);
     // 上传单个文件
-    const attInfo = await helper.uploadSingle(stream, attachment, config);
+    await helper.uploadSingle(stream, attachment.path);
     // 调用 Service 进行业务处理
-    const res = await service.attachment.create(attInfo);
+    const res = await service.attachment.create(attachment.dataValues);
     // 设置响应内容和响应状态码
-    ctx.helper.success({ ctx, res });
+    helper.success({ ctx, res });
   }
 
   /**
@@ -47,18 +48,20 @@ class LocalController extends Controller {
         // 表单filed 不做处理
       } else {
         if (!part.filename) {
-          throw new Error('未选择文件');
+          ctx.throw(400, '未选择文件');
         }
         const attachment = new ctx.model.Attachment();
+        // 组装上传记录信息
+        await helper.initAttachmentInfo(part.filename, attachment, config);
         // 上传单个文件
-        const attInfo = await helper.uploadSingle(part, attachment, config);
+        await helper.uploadSingle(part, attachment.path);
         // 调用 Service 进行业务处理
-        await service.attachment.create(attInfo);
+        await service.attachment.create(attachment.dataValues);
         res._ids.push(`${attachment.id}`);
       }
     }
     // 设置响应内容和响应状态码
-    ctx.helper.success({ ctx, res });
+    helper.success({ ctx, res });
   }
 
   /**
@@ -67,33 +70,44 @@ class LocalController extends Controller {
    * @memberof LocalController
    */
   async url() {
-    const { ctx, service, config } = this
-    const { name, url } = ctx.request.body
+    const { ctx, service, config } = this;
+    const { helper } = ctx;
+    const { name, url } = ctx.request.body;
     const attachment = new ctx.model.Attachment();
-
-    const filename = path.basename(name || url); // 文件名称
-    const extname = path.extname(name || url).toLowerCase(); // 文件扩展名称
-
-    // 组装参数 model
-    attachment.extname = extname;
-    attachment.filename = filename;
-    const baseUrl = config.uploadBaseUrl || '/uploads';
-    attachment.url = new URL(`${baseUrl}/${attachment.id}${extname}`).href;
-    const basePath = config.uploadBaseDir || `${config.baseDir}/app/public/uploads`;
-    const target = path.join(basePath, `${attachment.id}${attachment.extname}`);
-    attachment.path = target;
-
+    // 组装上传记录信息
+    await helper.initAttachmentInfo(name || url, attachment, config);
     // 使用image-downloader上传
     const options = {
       url: url,
-      dest: target
-    }
-    await download.image(options)
+      dest: attachment.path,
+    };
+    await download.image(options);
+    // 调用 Service 进行业务处理
+    const res = await service.attachment.create(attachment.dataValues);
+    // 设置响应内容和响应状态码
+    helper.success({ ctx, res });
+  }
 
-    // 入库
-    const res = await service.attachment.create(attachment.dataValues)
-
-    ctx.helper.success({ctx, res})
+  /**
+   * 更新上传附件
+   *
+   * @memberof LocalController
+   */
+  async update() {
+    const { ctx, service, config } = this;
+    const { helper, params } = ctx;
+    // 调用Service 删除旧文件，如果存在
+    const attachment = await service.attachment.updatePre(params.id);
+    // 获取用户上传的替换文件
+    const stream = await ctx.getFileStream();
+    // 组装上传记录信息
+    await helper.initAttachmentInfo(stream.filename, attachment, config);
+    // 上传单个文件
+    await helper.uploadSingle(stream, attachment.path);
+    // 调用 Service 进行业务处理
+    const { id, ...info } = attachment.dataValues;
+    const res = await service.attachment.update(id, info);
+    helper.success({ctx, res})
   }
 }
 

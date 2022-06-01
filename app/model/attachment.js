@@ -2,7 +2,7 @@
  * @description: 上传附件表
  * @author: zpl
  * @Date: 2022-05-31 12:38:15
- * @LastEditTime: 2022-05-31 21:43:12
+ * @LastEditTime: 2022-06-01 10:52:06
  * @LastEditors: zpl
  */
 'use strict';
@@ -45,19 +45,19 @@ module.exports = app => {
     comment: '上传附件表',
     indexes: [],
     createdAt: 'createdAt',
-    updatedAt: false
+    updatedAt: false,
   };
 
   const Attachment = model.define('attachment', attributes, options);
 
-  Attachment.prototype.toJSON = async function() {
+  Attachment.prototype.toJSON = async function () {
     return {
       id: this.id,
       filename: this.filename,
       extname: this.extname,
       url: this.url,
       extra: this.extra,
-      createdAt: this.createdAt
+      createdAt: this.createdAt,
     };
   };
 
