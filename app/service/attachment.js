@@ -2,7 +2,7 @@
  * @description: 上传附件
  * @author: zpl
  * @Date: 2022-05-31 14:12:09
- * @LastEditTime: 2022-06-01 15:25:40
+ * @LastEditTime: 2022-06-01 18:20:15
  * @LastEditors: zpl
  */
 'use strict';
@@ -65,7 +65,7 @@ class AttachmentService extends Service {
       video: ['.mov', '.mp4', '.avi'],
       audio: ['.mp3', '.wma', '.wav', '.ogg', '.ape', '.acc'],
     };
-    const { pageIndex, pageSize, sort, search, kind } = options;
+    const { pageIndex, pageSize, sort, search, kind, path } = options;
     const pIndex = helper.toInt(pageIndex);
     const pSize = helper.toInt(pageSize);
     const params = {
@@ -79,6 +79,17 @@ class AttachmentService extends Service {
     // 按文件类型筛选
     if (kind) {
       params.where.extname = { [Op.in]: attachmentKind[kind] };
+    }
+    // 按指定文件夹筛选
+    if (path) {
+      let realSubPath = path;
+      if (!realSubPath.startsWith('/')) {
+        realSubPath = '/' + realSubPath;
+      }
+      if (!realSubPath.endsWith('/')) {
+        realSubPath += '/';
+      }
+      params.where.subPaht = realSubPath;
     }
     // 排序
     if (sort) {
@@ -167,7 +178,14 @@ class AttachmentService extends Service {
     if (!attachment) {
       ctx.throw(404, '未找到指定记录');
     } else {
+      const lastIndex =
+        attachment.path.lastIndexOf('/') === -1 ? attachment.path.lastIndexOf('\\') : attachment.path.lastIndexOf('/');
+      const filePath = attachment.path.substring(0, lastIndex + 1);
       fs.unlinkSync(attachment.path);
+      const files = await fs.readdirSync(filePath);
+      if (!files.length) {
+        await fs.rmdirSync(filePath);
+      }
     }
     await attachment.destroy();
   }

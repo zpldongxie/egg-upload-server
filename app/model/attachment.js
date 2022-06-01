@@ -2,7 +2,7 @@
  * @description: 上传附件表
  * @author: zpl
  * @Date: 2022-05-31 12:38:15
- * @LastEditTime: 2022-06-01 15:22:52
+ * @LastEditTime: 2022-06-01 18:05:12
  * @LastEditors: zpl
  */
 'use strict';
@@ -33,7 +33,13 @@ module.exports = app => {
     path: {
       type: Sequelize.STRING,
       allowNull: false,
-      comment: '存贮位置',
+      comment: '保存绝对位置',
+    },
+    subPath: {
+      type: Sequelize.STRING,
+      allowNull: false,
+      defaultValue: '/',
+      comment: '保存相对位置，用于支持按目录层级查找',
     },
     extra: {
       type: Sequelize.STRING,
@@ -56,6 +62,7 @@ module.exports = app => {
       filename: this.filename,
       extname: this.extname,
       url: this.url,
+      subPath: this.subPath,
       extra: this.extra,
       createdAt: this.createdAt,
     };

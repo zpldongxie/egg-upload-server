@@ -34,7 +34,13 @@ module.exports = {
       path: {
         type: Sequelize.STRING,
         allowNull: false,
-        comment: '存贮位置',
+        comment: '保存绝对位置',
+      },
+      subPath: {
+        type: Sequelize.STRING,
+        allowNull: false,
+        defaultValue: '/',
+        comment: '保存相对位置，用于支持按目录层级查找',
       },
       extra: {
         type: Sequelize.STRING,
