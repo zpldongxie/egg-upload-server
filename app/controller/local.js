@@ -2,7 +2,7 @@
  * @description: 本地上传
  * @author: zpl
  * @Date: 2022-05-31 11:06:37
- * @LastEditTime: 2022-05-31 21:56:30
+ * @LastEditTime: 2022-06-01 08:38:54
  * @LastEditors: zpl
  */
 'use strict';
@@ -39,11 +39,12 @@ class LocalController extends Controller {
    */
   async multiple() {
     const { ctx, service, config } = this;
-    const res = {};
-    const files = [];
+    const { helper } = ctx;
+    const parts = ctx.multipart();
+    const res = { _ids: [] };
 
     let part;
-    while ((part = await ctx.multipart()) != null) {
+    while ((part = await parts()) != null) {
       if (part.length) {
         // 表单filed 不做处理
       } else {
@@ -54,12 +55,12 @@ class LocalController extends Controller {
         // 上传单个文件
         const attInfo = await helper.uploadSingle(part, attachment, config);
         // 调用 Service 进行业务处理
-        const res = await service.attachment.create(attInfo);
-        files.push(res)
+        await service.attachment.create(attInfo);
+        res._ids.push(`${attachment.id}`);
       }
     }
     // 设置响应内容和响应状态码
-    ctx.helper.success({ ctx, files });
+    ctx.helper.success({ ctx, res });
   }
 }
 
