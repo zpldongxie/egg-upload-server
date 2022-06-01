@@ -1,6 +1,6 @@
 {
   "name": "egg-uploader",
-  "version": "1.0.0",
+  "version": "1.0.1",
   "description": "基于egg实现的上传服务，支持本地上传、阿里云上传、七牛上传等",
   "private": true,
   "egg": {
