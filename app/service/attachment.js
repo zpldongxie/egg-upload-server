@@ -2,7 +2,7 @@
  * @description: 上传附件
  * @author: zpl
  * @Date: 2022-05-31 14:12:09
- * @LastEditTime: 2022-06-01 18:20:15
+ * @LastEditTime: 2022-06-07 10:41:10
  * @LastEditors: zpl
  */
 'use strict';
@@ -89,7 +89,7 @@ class AttachmentService extends Service {
       if (!realSubPath.endsWith('/')) {
         realSubPath += '/';
       }
-      params.where.subPaht = realSubPath;
+      params.where.subPath = realSubPath;
     }
     // 排序
     if (sort) {
