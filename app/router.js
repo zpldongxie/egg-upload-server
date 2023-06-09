@@ -6,6 +6,7 @@
 module.exports = app => {
   const { router, controller } = app;
 
+  // 本地上传
   router.get('/upload/local', controller.local.index); // 查询列表
   router.get('/upload/local/:id', controller.local.show); // 获取单个文件
   router.post('/upload/local/single', controller.local.single); // 上传单个文件
@@ -14,4 +15,7 @@ module.exports = app => {
   router.post('/upload/local/update/:id', controller.local.update); // 更新上传附件
   router.put('/upload/local/:id', controller.local.extra); // 编辑图片描述
   router.delete('/upload/local/:id', controller.local.destroy); // 编辑图片描述
+  
+  // 腾讯云上传
+  router.get('/upload/tencent', controller.tencent.index); // 查询列表
 };

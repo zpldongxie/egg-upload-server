@@ -106,7 +106,7 @@ class LocalController extends Controller {
     await helper.initAttachmentInfo(name || url, attachment, config, path);
     // 使用image-downloader上传
     const options = {
-      url: url,
+      url,
       dest: attachment.path,
     };
     await download.image(options);
